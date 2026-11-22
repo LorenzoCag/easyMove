@@ -87,12 +87,60 @@ export function haversineMiles(
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 
-type GeoResult = {
+export type GeoResult = {
+  name?: string;
   latitude: number;
   longitude: number;
   country_code?: string;
   admin1?: string;
 };
+
+export type CitySuggestion = { label: string; city: string; stateAbbr: string };
+
+/**
+ * Turns raw geocoding results into unique "City, ST" suggestions. When the user has already
+ * typed a state after the comma ("Austin, T"), only matching states are kept.
+ */
+export function toCitySuggestions(results: GeoResult[], query: string): CitySuggestion[] {
+  const stateFilter = query.includes(",")
+    ? (query.split(",").slice(1).join(",").trim().replace(/\./g, "").toLowerCase())
+    : "";
+  const seen = new Set<string>();
+  const out: CitySuggestion[] = [];
+  for (const r of results) {
+    if (r.country_code !== "US" || !r.admin1 || !r.name) continue;
+    const state = findState(r.admin1);
+    if (!state) continue;
+    if (
+      stateFilter &&
+      !state.abbr.toLowerCase().startsWith(stateFilter) &&
+      !state.name.toLowerCase().startsWith(stateFilter)
+    )
+      continue;
+    const label = `${r.name}, ${state.abbr}`;
+    if (seen.has(label)) continue;
+    seen.add(label);
+    out.push({ label, city: r.name, stateAbbr: state.abbr });
+  }
+  return out.slice(0, 6);
+}
+
+/** Looks up US city suggestions for a partially typed "City" or "City, ST" string. */
+export async function searchCities(query: string, signal?: AbortSignal): Promise<CitySuggestion[]> {
+  const name = query.split(",")[0]?.trim() ?? "";
+  if (name.length < 2) return [];
+  try {
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(
+      name,
+    )}&count=20&language=en&format=json&countryCode=US`;
+    const res = await fetch(url, signal ? { signal } : undefined);
+    if (!res.ok) return [];
+    const data = (await res.json()) as { results?: GeoResult[] };
+    return toCitySuggestions(data.results ?? [], query);
+  } catch {
+    return [];
+  }
+}
 
 async function geocodeCity(loc: ParsedLocation): Promise<{ lat: number; lon: number } | null> {
   try {

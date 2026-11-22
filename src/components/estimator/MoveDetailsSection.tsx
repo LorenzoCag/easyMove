@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { ACCESS_OPTIONS, HOME_SIZE_OPTIONS, type Access, type HomeSize } from "@/lib/estimate";
+import { CityInput } from "./CityInput";
 import { FieldError, SectionCard } from "./SectionCard";
 import type { FieldErrors, MoveDetails } from "./types";
 
@@ -43,17 +44,15 @@ export function MoveDetailsSection({
           <Label htmlFor="from" className="mb-2 block font-semibold">
             Moving From
           </Label>
-          <div className="relative">
-            <MapPin className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              id="from"
-              placeholder="City, State (e.g. Austin, TX)"
-              className={cn(fieldClass, "pl-9")}
-              value={value.from}
-              onChange={(e) => onChange({ from: e.target.value })}
-              aria-invalid={!!errors.from}
-            />
-          </div>
+          <CityInput
+            id="from"
+            icon={MapPin}
+            placeholder="City, State (e.g. Austin, TX)"
+            className={fieldClass}
+            value={value.from}
+            onChange={(from) => onChange({ from })}
+            invalid={!!errors.from}
+          />
           <FieldError message={errors.from} />
         </div>
 
@@ -61,17 +60,15 @@ export function MoveDetailsSection({
           <Label htmlFor="to" className="mb-2 block font-semibold">
             Moving To
           </Label>
-          <div className="relative">
-            <Navigation className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              id="to"
-              placeholder="City, State (e.g. Denver, CO)"
-              className={cn(fieldClass, "pl-9")}
-              value={value.to}
-              onChange={(e) => onChange({ to: e.target.value })}
-              aria-invalid={!!errors.to}
-            />
-          </div>
+          <CityInput
+            id="to"
+            icon={Navigation}
+            placeholder="City, State (e.g. Denver, CO)"
+            className={fieldClass}
+            value={value.to}
+            onChange={(to) => onChange({ to })}
+            invalid={!!errors.to}
+          />
           <FieldError message={errors.to} />
         </div>
 
