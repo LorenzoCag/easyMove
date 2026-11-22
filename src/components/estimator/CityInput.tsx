@@ -15,7 +15,15 @@ type Props = {
 };
 
 /** Text input that suggests US cities ("City, ST") as the user types. */
-export function CityInput({ id, value, onChange, placeholder, icon: Icon, invalid, className }: Props) {
+export function CityInput({
+  id,
+  value,
+  onChange,
+  placeholder,
+  icon: Icon,
+  invalid,
+  className,
+}: Props) {
   const listId = useId();
   const [suggestions, setSuggestions] = useState<CitySuggestion[]>([]);
   const [open, setOpen] = useState(false);

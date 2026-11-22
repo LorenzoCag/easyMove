@@ -65,7 +65,10 @@ export function findState(raw: string): StateInfo | undefined {
 
 /** Accepts "City, ST" or "City, State Name". */
 export function parseLocation(input: string): ParsedLocation | null {
-  const parts = input.split(",").map((p) => p.trim()).filter(Boolean);
+  const parts = input
+    .split(",")
+    .map((p) => p.trim())
+    .filter(Boolean);
   if (parts.length < 2) return null;
   const state = findState(parts[parts.length - 1] ?? "");
   const city = parts.slice(0, -1).join(", ");
@@ -103,7 +106,7 @@ export type CitySuggestion = { label: string; city: string; stateAbbr: string };
  */
 export function toCitySuggestions(results: GeoResult[], query: string): CitySuggestion[] {
   const stateFilter = query.includes(",")
-    ? (query.split(",").slice(1).join(",").trim().replace(/\./g, "").toLowerCase())
+    ? query.split(",").slice(1).join(",").trim().replace(/\./g, "").toLowerCase()
     : "";
   const seen = new Set<string>();
   const out: CitySuggestion[] = [];
@@ -168,7 +171,10 @@ export async function estimateDrivingMiles(
 ): Promise<{ miles: number; approximate: boolean }> {
   const [a, b] = await Promise.all([geocodeCity(from), geocodeCity(to)]);
   if (a && b) {
-    return { miles: Math.max(5, Math.round(haversineMiles(a, b) * ROAD_FACTOR)), approximate: false };
+    return {
+      miles: Math.max(5, Math.round(haversineMiles(a, b) * ROAD_FACTOR)),
+      approximate: false,
+    };
   }
   // Fallback when the city lookup fails.
   if (from.state.abbr === to.state.abbr) {

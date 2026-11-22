@@ -26,8 +26,6 @@ describe("toCitySuggestions", () => {
 
   it("filters by the state fragment typed after the comma", () => {
     expect(toCitySuggestions(results, "Austin, T").map((s) => s.label)).toEqual(["Austin, TX"]);
-    expect(toCitySuggestions(results, "Austin, minn").map((s) => s.label)).toEqual([
-      "Austin, MN",
-    ]);
+    expect(toCitySuggestions(results, "Austin, minn").map((s) => s.label)).toEqual(["Austin, MN"]);
   });
 });
